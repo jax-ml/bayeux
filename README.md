@@ -3,7 +3,7 @@
 *Stitching together models and samplers*
 
 [![Unittests](https://github.com/jax-ml/bayeux/actions/workflows/pytest_and_autopublish.yml/badge.svg)](https://github.com/jax-ml/bayeux/actions/workflows/pytest_and_autopublish.yml)
-[![PyPI version](https://badge.fury.io/py/bayeux-jax.svg)](https://badge.fury.io/py/bayeux-jax)
+[![PyPI version](https://badge.fury.io/py/bayeux.svg)](https://badge.fury.io/py/bayeux)
 
 The goal of `bayeux` is to allow users to write a model in JAX and use
 best-in-class Bayesian inference methods on it. The API aims to be simple, self
