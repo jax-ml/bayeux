@@ -1,5 +1,5 @@
 [project]
-name = "bayeux"
+name = "bayeux-ml"
 description = "Stitching together probabilistic models and inference."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -33,6 +33,11 @@ repository = "https://github.com/jax-ml/bayeux"
 changelog = "https://github.com/jax-ml/bayeux/blob/main/CHANGELOG.md"
 # documentation = ""
 
+[tool.poetry]
+packages = [
+    { include = "bayeux" },
+]
+
 [project.optional-dependencies]
 # Development deps (unittest, linting, formating,...)
 # Installed through `pip install -e .[dev]`
@@ -55,6 +60,9 @@ pyink-use-majority-quotes = true
 # poetry, setuptools,...). All backends are supported by `pip install`
 requires = ["flit_core >=3.8,<4"]
 build-backend = "flit_core.buildapi"
+
+[tool.flit.module]
+name = "bayeux"
 
 [tool.flit.sdist]
 # Flit specific options (files to exclude from the PyPI package).
