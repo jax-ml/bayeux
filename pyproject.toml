@@ -16,7 +16,7 @@ keywords = []
 dependencies = [
   "jax>=0.4.6",
   "tensorflow-probability[jax]>=0.19.0",
-  "oryx@git+https://github.com/jax-ml/oryx",
+  "oryx>=0.2.5",
   "arviz",
   "optax",
   "blackjax",
