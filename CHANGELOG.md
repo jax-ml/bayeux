@@ -23,9 +23,14 @@ To release a new version (e.g. from `1.0.0` -> `2.0.0`):
 
 ## [Unreleased]
 
-## [0.1.0] - 2022-01-01
+## [0.1.2] - 2024-01-03
 
-* Initial release
+### Slightly improved Python 3.9 support
 
-[Unreleased]: https://github.com/jax-ml/bayeux/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.0
+## [0.1.1] - 2023-12-20
+
+### Initial release
+
+[Unreleased]: https://github.com/jax-ml/bayeux/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.2
+[0.1.1]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.1
