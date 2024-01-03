@@ -31,12 +31,7 @@ dynamic = ["version"]
 homepage = "https://github.com/jax-ml/bayeux"
 repository = "https://github.com/jax-ml/bayeux"
 changelog = "https://github.com/jax-ml/bayeux/blob/main/CHANGELOG.md"
-# documentation = ""
-
-[tool.poetry]
-packages = [
-    { include = "bayeux" },
-]
+documentation = "https://jax-ml.github.io/bayeux"
 
 [project.optional-dependencies]
 # Development deps (unittest, linting, formating,...)
@@ -46,6 +41,21 @@ dev = [
     "pytest-xdist",
     "pylint>=2.6.0",
     "pyink",
+]
+
+
+docs = [
+    # Latest versions at time of writing.
+    "mkdocs==1.3.0",            # Main documentation generator.
+    "mkdocs-material==7.3.6",   # Theme
+    "pymdown-extensions==9.4",  # Markdown extensions e.g. to handle LaTeX.
+    "mkdocstrings==0.17.0",     # Autogenerate documentation from docstrings.
+    "mknotebooks==0.7.1",       # Turn Jupyter Lab notebooks into webpages.
+    "pytkdocs_tweaks==0.0.8",   # Tweaks mkdocstrings to improve various aspects
+    "jinja2==3.0.3",            # Older version. After 3.1.0 seems to be incompatible with current versions of mkdocstrings.
+    "nbconvert==6.5.0",        # | Older verson to avoid error
+    "nbformat==5.4.0",          # |
+    "pygments==2.14.0"
 ]
 
 [tool.pyink]
