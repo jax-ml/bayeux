@@ -26,13 +26,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install .[docs]
 
-      - name: Build docs
-        run: |
-          mkdocs build
-          mkdocs build  # twice, see https://github.com/patrick-kidger/pytkdocs_tweaks
-
       - name: Upload docs
-        uses: actions/upload-artifact@v2
-        with:
-          name: docs
-          path: site  # where `mkdocs build` puts the built site
+        run: |
+          mkdocs build  # twice, see https://github.com/patrick-kidger/pytkdocs_tweaks
+          mkdocs gh-deploy --force
