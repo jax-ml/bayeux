@@ -16,7 +16,7 @@
 
 import dataclasses
 import inspect
-from typing import Callable
+from typing import Callable, Optional
 
 from bayeux._src import debug
 from bayeux._src import initialization
@@ -49,7 +49,7 @@ def _default_init(
 
 def constrain(
     transform_fn: types.JAXFn,
-    inverse_log_det_jacobian: types.JAXFn | None = None,
+    inverse_log_det_jacobian: Optional[types.JAXFn] = None,
 ) -> Callable[[types.LogDensityFn], types.LogDensityFn]:
   """Returns a log density function that operates in an unconstrained space.
 
@@ -96,10 +96,10 @@ class Base:
   log_density: types.LogDensityFn
   test_point: types.Point
   transform_fn: types.JAXFn = _nothing
-  inverse_transform_fn: types.JAXFn | None = None
-  inverse_log_det_jacobian: types.JAXFn | None = None
+  inverse_transform_fn: Optional[types.JAXFn] = None
+  inverse_log_det_jacobian: Optional[types.JAXFn] = None
 
-  initial_state: types.Point | None = None
+  initial_state: Optional[types.Point] = None
 
   def get_initial_state(self, key, num_chains=8):
     return _default_init(
