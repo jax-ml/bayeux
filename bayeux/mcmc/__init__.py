@@ -19,12 +19,15 @@ import importlib
 
 __all__ = []
 if importlib.util.find_spec("blackjax") is not None:
+  from bayeux._src.mcmc.blackjax import CheesHMC as CheesHMCblackjax
   from bayeux._src.mcmc.blackjax import HMC as HMCblackjax
   from bayeux._src.mcmc.blackjax import HMCPathfinder as HMC_Pathfinder_blackjax
+  from bayeux._src.mcmc.blackjax import MeadsHMC as MeadsHMCblackjax
   from bayeux._src.mcmc.blackjax import NUTS as NUTSblackjax
   from bayeux._src.mcmc.blackjax import NUTSPathfinder as NUTS_Pathfinder_blackjax
-  __all__.extend(["HMCblackjax", "NUTSblackjax",
-                  "HMC_Pathfinder_blackjax", "NUTS_Pathfinder_blackjax"])
+  __all__.extend(["HMCblackjax", "CheesHMCblackjax", "MeadsHMCblackjax",
+                  "NUTSblackjax", "HMC_Pathfinder_blackjax",
+                  "NUTS_Pathfinder_blackjax"])
 
 if importlib.util.find_spec("numpyro") is not None:
   from bayeux._src.mcmc.numpyro import HMC as HMCnumpyro

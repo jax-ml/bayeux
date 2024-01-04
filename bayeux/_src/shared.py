@@ -15,6 +15,7 @@
 """Shared functionality for MCMC sampling."""
 
 import dataclasses
+import functools
 import inspect
 from typing import Callable, Optional
 
@@ -24,6 +25,16 @@ from bayeux._src import types
 import jax
 import jax.numpy as jnp
 import oryx
+
+
+def map_fn(chain_method, fn):
+  if chain_method == "parallel":
+    return jax.pmap(fn)
+  elif chain_method == "vectorized":
+    return jax.vmap(fn)
+  elif chain_method == "sequential":
+    return functools.partial(jax.tree_map, fn)
+  raise ValueError(f"Chain method {chain_method} not supported.")
 
 
 def _default_init(

@@ -14,11 +14,9 @@
 
 """Shared functions for optimizers."""
 import collections
-import functools
 
 from bayeux._src import debug
 from bayeux._src import shared
-import jax
 
 
 OptimizerResults = collections.namedtuple("OptimizerResults",
@@ -88,13 +86,7 @@ class Optimizer(shared.Base):
     return lambda x: -self.log_density(self.transform_fn(x))
 
   def _map_optimizer(self, chain_method, fit):
-    if chain_method == "parallel":
-      return jax.pmap(fit)
-    elif chain_method == "vectorized":
-      return jax.vmap(fit)
-    elif chain_method == "sequential":
-      return functools.partial(jax.tree_map, fit)
-    raise ValueError(f"Chain method {chain_method} not supported.")
+    return shared.map_fn(chain_method, fit)
 
   def _prep_args(self, seed, kwargs):
     num_particles = kwargs["extra_parameters"]["num_particles"]

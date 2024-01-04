@@ -29,8 +29,7 @@ _REQUIRED_KWARGS = (
     "transform_fn",
     "inverse_transform_fn",
     "inverse_log_det_jacobian",
-    "initial_state",
-)
+    "initial_state",)
 
 
 class _Namespace:
