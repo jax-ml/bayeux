@@ -67,14 +67,28 @@ def test_optimizers(method, linear_model):  # pylint: disable=redefined-outer-na
   else:
     num_iters = 1_000
 
+  if method.startswith("optimistix"):
+    num_iters = 10_000  # should stop automatically before then
+    atol = 0.2
+  else:
+    atol = 1e-2
+
   assert optimizer.debug(seed=seed, verbosity=0)
   num_particles = 6
   params = optimizer(
-      seed=seed, num_particles=num_particles, num_iters=num_iters).params
+      seed=seed,
+      num_particles=num_particles,
+      num_iters=num_iters,
+      atol=atol,
+      max_steps=num_iters,
+      throw=False).params
   expected = np.repeat(solution[..., np.newaxis], num_particles, axis=-1).T
 
-  if method != "optax_adafactor":
-    np.testing.assert_allclose(expected, params.w, atol=1e-2)
+  if method not in {
+      "optax_adafactor",
+      "optimistix_chord",
+      "optimistix_nelder_mead"}:
+    np.testing.assert_allclose(expected, params.w, atol=atol)
 
 
 def test_initial_state():

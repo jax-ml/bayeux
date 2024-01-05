@@ -19,6 +19,7 @@ dependencies = [
   "oryx>=0.2.5",
   "arviz",
   "optax",
+  "optimistix",
   "blackjax",
   "numpyro",
   "jaxopt",
