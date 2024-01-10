@@ -23,6 +23,13 @@ To release a new version (e.g. from `1.0.0` -> `2.0.0`):
 
 ## [Unreleased]
 
+## [0.1.3] - 2024-01-10
+
+### Allow automatic model creation from numpyro and TFP
+### Add optimistix support
+### Add meads and chees from blackjax
+### Add documentation
+
 ## [0.1.2] - 2024-01-03
 
 ### Slightly improved Python 3.9 support
@@ -31,6 +38,7 @@ To release a new version (e.g. from `1.0.0` -> `2.0.0`):
 
 ### Initial release
 
-[Unreleased]: https://github.com/jax-ml/bayeux/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/jax-ml/bayeux/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.3
 [0.1.2]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.2
 [0.1.1]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.1
