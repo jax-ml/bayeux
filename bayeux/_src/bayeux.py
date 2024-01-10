@@ -20,6 +20,7 @@ from bayeux import mcmc
 from bayeux import optimize
 from bayeux import vi
 from bayeux._src import shared
+import jax
 import oryx
 
 _MODULES = (mcmc, optimize, vi)
@@ -104,3 +105,49 @@ class Model(shared.Base):
       k = getattr(self, name)
       methods.append("\t." + "\n\t.".join(str(k).split()))
     return "\n".join(methods)
+
+  @classmethod
+  def from_tfp(cls, pinned_joint_distribution, initial_state=None):
+    log_density = pinned_joint_distribution.log_prob
+    test_point = pinned_joint_distribution.sample_unpinned(
+        seed=jax.random.PRNGKey(0))
+    transform_fn = (
+        pinned_joint_distribution.experimental_default_event_space_bijector()
+    )
+    inverse_transform_fn = transform_fn.inverse
+    inverse_log_det_jacobian = transform_fn.inverse_log_det_jacobian
+    return cls(
+        log_density=log_density,
+        test_point=test_point,
+        transform_fn=transform_fn,
+        initial_state=initial_state,
+        inverse_transform_fn=inverse_transform_fn,
+        inverse_log_det_jacobian=inverse_log_det_jacobian)
+
+  @classmethod
+  def from_numpyro(cls, numpyro_fn, initial_state=None):
+    import numpyro  # pylint: disable=g-import-not-at-top
+
+    def log_density(*args, **kwargs):
+      # This clause is only required because the tfp vi routine tries to
+      # pass dictionaries as keyword arguments, so this allows either
+      # log_density(params) or log_density(**params)
+      if args:
+        x = args[0]
+      else:
+        x = kwargs
+      return numpyro.infer.util.log_density(numpyro_fn, (), {}, x)[0]
+
+    test_point = numpyro.infer.Predictive(
+        numpyro_fn, num_samples=1)(jax.random.PRNGKey(0))
+    test_point = {k: v[0] for k, v in test_point.items() if k != "observed"}
+
+    def transform_fn(x):
+      return numpyro.infer.util.constrain_fn(numpyro_fn, (), {}, x)
+
+    return cls(
+        log_density=log_density,
+        test_point=test_point,
+        transform_fn=transform_fn,
+        initial_state=initial_state)
+
