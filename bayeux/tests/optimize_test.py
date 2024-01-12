@@ -88,6 +88,7 @@ def test_optimizers(method, linear_model):  # pylint: disable=redefined-outer-na
       "optax_adafactor",
       "optax_adagrad",
       "optax_sm3",
+      "optimistix_bfgs",
       "optimistix_chord",
       "optimistix_nelder_mead"}:
     np.testing.assert_allclose(expected, params.w, atol=atol)

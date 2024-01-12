@@ -42,7 +42,9 @@ def test_from_numpyro():
 
   bx_model = bx.Model.from_numpyro(numpyro_model)
   ret = bx_model.optimize.optax_adam(seed=jax.random.key(0))
-  assert ret is not None
+  log_probs = jax.vmap(bx_model.log_density)(ret.params)
+  expected = np.full(8, -42.56270289)
+  np.testing.assert_allclose(log_probs, expected, atol=1e-3)
 
 
 def test_from_tfp():
@@ -64,7 +66,9 @@ def test_from_tfp():
   pinned_model = tfp_model.experimental_pin(observed=treatment_effects)
   bx_model = bx.Model.from_tfp(pinned_model)
   ret = bx_model.optimize.optax_adam(seed=jax.random.key(0))
-  assert ret is not None
+  log_probs = jax.vmap(bx_model.log_density)(ret.params)
+  expected = np.full(8, -42.56270289)
+  np.testing.assert_allclose(log_probs, expected, atol=1e-3)
 
 
 def test_from_pymc():
@@ -85,7 +89,9 @@ def test_from_pymc():
 
   bx_model = bx.Model.from_pymc(model)
   ret = bx_model.optimize.optax_adam(seed=jax.random.key(0))
-  assert ret is not None
+  log_probs = jax.vmap(bx_model.log_density)(ret.params)
+  expected = np.full(8, -42.56270289)
+  np.testing.assert_allclose(log_probs, expected, atol=1e-3)
 
 
 def test_from_pymc_transforms():
