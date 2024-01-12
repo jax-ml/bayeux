@@ -23,6 +23,10 @@ To release a new version (e.g. from `1.0.0` -> `2.0.0`):
 
 ## [Unreleased]
 
+## [0.1.4] - 2024-01-11
+
+### Allow automatic model creation from PyMC
+
 ## [0.1.3] - 2024-01-10
 
 ### Allow automatic model creation from numpyro and TFP
@@ -38,7 +42,8 @@ To release a new version (e.g. from `1.0.0` -> `2.0.0`):
 
 ### Initial release
 
-[Unreleased]: https://github.com/jax-ml/bayeux/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/jax-ml/bayeux/compare/v0.1.4...HEAD
+[0.1.4]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.4
 [0.1.3]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.3
 [0.1.2]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.2
 [0.1.1]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.1
