@@ -23,6 +23,10 @@ To release a new version (e.g. from `1.0.0` -> `2.0.0`):
 
 ## [Unreleased]
 
+## [0.1.5] - 2024-01-12
+
+### Bugfix for PyMC models
+
 ## [0.1.4] - 2024-01-11
 
 ### Allow automatic model creation from PyMC
@@ -42,7 +46,8 @@ To release a new version (e.g. from `1.0.0` -> `2.0.0`):
 
 ### Initial release
 
-[Unreleased]: https://github.com/jax-ml/bayeux/compare/v0.1.4...HEAD
+[Unreleased]: https://github.com/jax-ml/bayeux/compare/v0.1.5...HEAD
+[0.1.5]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.5
 [0.1.4]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.4
 [0.1.3]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.3
 [0.1.2]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.2
