@@ -21,6 +21,7 @@ from bayeux import optimize
 from bayeux import vi
 from bayeux._src import shared
 import jax
+import jax.numpy as jnp
 import oryx
 
 _MODULES = (mcmc, optimize, vi)
@@ -151,3 +152,81 @@ class Model(shared.Base):
         transform_fn=transform_fn,
         initial_state=initial_state)
 
+  @classmethod
+  def from_pymc(cls, pm_model, initial_state=None):
+    import pymc as pm  # pylint: disable=g-import-not-at-top
+    import pymc.sampling.jax as pm_jax  # pylint: disable=g-import-not-at-top
+
+    logp = pm_jax.get_jaxified_logp(
+        pm.model.transform.conditioning.remove_value_transforms(pm_model))
+
+    rvs = pm_model.free_RVs
+    values = pm_model.value_vars
+    names = [v.name for v in rvs]
+
+    def identity(x, *_):
+      return x
+
+    def none(*_):
+      return 0.
+
+    # We have different ideas of forward and backward!
+    fwd_transforms = {
+        k.name: identity if v is None else v.backward
+        for k, v in pm_model.rvs_to_transforms.items()}
+    bwd_transforms = {
+        k.name: identity if v is None else v.forward
+        for k, v in pm_model.rvs_to_transforms.items()}
+
+    def forward_transform(pt):
+      return [
+          fwd_transforms[k](v, *([] if v.owner is None else v.owner.inputs))
+          for k, v in zip(names, pt)]
+
+    def backward_transform(pt):
+      return [
+          bwd_transforms[k](v, *([] if v.owner is None else v.owner.inputs))
+          for k, v in zip(names, pt)
+      ]
+
+    ildjs = {
+        k.name: none if v is None else v.log_jac_det
+        for k, v in pm_model.rvs_to_transforms.items()}
+
+    def ildj(pt):
+      return -pm.math.log(
+          pm.math.sum([
+              ildjs[k](v, *([] if v.owner is None else v.owner.inputs))
+              for k, v in zip(names, pt)]))
+
+    fwd = pm_jax.get_jaxified_graph(
+        inputs=values,
+        outputs=pm_model.replace_rvs_by_values(forward_transform(rvs)))
+    bwd = pm_jax.get_jaxified_graph(
+        inputs=values,
+        outputs=pm_model.replace_rvs_by_values(backward_transform(rvs)))
+    ildj = pm_jax.get_jaxified_graph(
+        inputs=values,
+        outputs=pm_model.replace_rvs_by_values([ildj(rvs)]))
+    def logp_wrap(args):
+      return logp([args[k] for k in names])
+
+    def fwd_wrap(args):
+      ret = fwd(*[args[k] for k in names])
+      return dict(zip(names, ret))
+
+    def bwd_wrap(args):
+      ret = bwd(*[args[k] for k in names])
+      return dict(zip(names, ret))
+
+    def ildj_wrap(args):
+      return ildj(*[args[k] for k in names])[0]
+
+    test_point = {rv.name: jnp.ones(rv.shape.eval()) for rv in rvs}
+    return cls(
+        log_density=logp_wrap,
+        test_point=test_point,
+        transform_fn=fwd_wrap,
+        inverse_transform_fn=bwd_wrap,
+        inverse_log_det_jacobian=ildj_wrap,
+        initial_state=initial_state)

@@ -65,3 +65,38 @@ def test_from_tfp():
   bx_model = bx.Model.from_tfp(pinned_model)
   ret = bx_model.optimize.optax_adam(seed=jax.random.key(0))
   assert ret is not None
+
+
+def test_from_pymc():
+  import pymc as pm  # pylint: disable=g-import-not-at-top
+
+  treatment_effects = np.array([28, 8, -3, 7, -1, 1, 18, 12], dtype=np.float32)
+  treatment_stddevs = np.array(
+      [15, 10, 16, 11, 9, 11, 10, 18], dtype=np.float32)
+
+  with pm.Model() as model:
+    avg_effect = pm.Normal('avg_effect', 0., 10.)
+    avg_stddev = pm.HalfNormal('avg_stddev', 10.)
+    school_effects = pm.Normal('school_effects', shape=8)
+    pm.Normal('observed',
+              avg_effect + avg_stddev * school_effects,
+              treatment_stddevs,
+              observed=treatment_effects)
+
+  bx_model = bx.Model.from_pymc(model)
+  ret = bx_model.optimize.optax_adam(seed=jax.random.key(0))
+  assert ret is not None
+
+
+def test_from_pymc_transforms():
+  import pymc as pm  # pylint: disable=g-import-not-at-top
+
+  with pm.Model() as model:
+    pm.Normal('y')
+    lo = pm.Uniform('lo', lower=-1., upper=0.)
+    hi = pm.Uniform('hi', lower=0., upper=1.)
+    pm.Uniform('x', lower=lo, upper=hi)
+
+  bx_model = bx.Model.from_pymc(model)
+  ret = bx_model.optimize.optax_adam(seed=jax.random.key(0))
+  assert ret is not None
