@@ -60,7 +60,7 @@ def get_fit_kwargs(log_density, kwargs):
       tfp.vi.fit_surrogate_posterior_stateless)
   fit_kwargs.pop("seed")
   fit_kwargs["optimizer"] = optax.adam(learning_rate=0.01)
-  fit_kwargs["target_log_prob_fn"] = log_density
+  fit_kwargs["target_log_prob_fn"] = jax.vmap(log_density)
 
   fit_kwargs = {
       "sample_size": 16,

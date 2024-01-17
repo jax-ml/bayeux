@@ -188,9 +188,13 @@ class Model(shared.Base):
     bwd = pm_jax.get_jaxified_graph(
         inputs=values,
         outputs=pm_model.replace_rvs_by_values(inv_rvs))
-
-    def logp_wrap(args):
-      return logp([args[k] for k in names])
+    def logp_wrap(*args, **kwargs):
+      # This clause is only required because the tfp vi routine tries to
+      # pass dictionaries as keyword arguments, so this allows either
+      # log_density(params) or log_density(**params)
+      if args:
+        kwargs = args[0]
+      return logp([kwargs[k] for k in names])
 
     def fwd_wrap(args):
       ret = fwd(*[args[k] for k in names])
