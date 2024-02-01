@@ -21,6 +21,7 @@ dependencies = [
   "optax",
   "optimistix",
   "blackjax",
+  "flowmc",
   "numpyro",
   "jaxopt",
 ]

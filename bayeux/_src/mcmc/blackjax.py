@@ -1,4 +1,4 @@
-# Copyright 2023 The bayeux Authors.
+# Copyright 2024 The bayeux Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -312,8 +312,8 @@ def get_algorithm_kwargs(algorithm, log_density, kwargs):
   algorithm_kwargs, algorithm_required = shared.get_default_signature(algorithm)
   kwargs_with_defaults = {
       "logdensity_fn": log_density,
-      "step_size": 0.01,
-      "num_integration_steps": 8,
+      "step_size": 0.5,
+      "num_integration_steps": 16,
   } | kwargs
   algorithm_kwargs.update(
       {
