@@ -48,17 +48,6 @@ _LOCAL_SAMPLERS = {"mala": MALA.MALA, "hmc": HMC.HMC}
 
 def get_nf_model_kwargs(nf_model, n_features, kwargs):
   """Sets defaults and merges user-provided adaptation keywords."""
-  nf_model_kwargs, nf_model_required = shared.get_default_signature(
-      nf_model)
-  nf_model_kwargs.update(
-      {k: kwargs[k] for k in nf_model_kwargs if k in kwargs})
-  nf_model_kwargs.update(
-      {k: kwargs[k] for k in nf_model_required if k in kwargs})
-  nf_model_kwargs.setdefault("n_features", n_features)
-  nf_model_required.remove("key")
-  nf_model_required.remove("kwargs")
-  nf_model_required = nf_model_required - nf_model_kwargs.keys()
-
   defaults = {
       # RealNVP kwargs
       "n_hidden": 100,
@@ -68,11 +57,15 @@ def get_nf_model_kwargs(nf_model, n_features, kwargs):
       "num_bins": 8,
       "hidden_size": [64, 64],
       "spline_range": (-10.0, 10.0),
-  }
-  for key, value in defaults.items():
-    if key in nf_model_required:
-      nf_model_kwargs[key] = value
+      "n_features": n_features,
+  } | kwargs
 
+  nf_model_kwargs, nf_model_required = shared.get_default_signature(
+      nf_model)
+  nf_model_kwargs.update(
+      {k: defaults[k] for k in nf_model_required if k in defaults})
+  nf_model_required.remove("key")
+  nf_model_required.remove("kwargs")
   nf_model_required = nf_model_required - nf_model_kwargs.keys()
 
   if nf_model_required:
@@ -81,19 +74,14 @@ def get_nf_model_kwargs(nf_model, n_features, kwargs):
         f"{','.join(nf_model_required)}. Probably file a bug, but "
         "you can try to manually supply them as keywords."
     )
+  nf_model_kwargs.update(
+      {k: defaults[k] for k in nf_model_kwargs if k in defaults})
+
   return nf_model_kwargs
 
 
 def get_local_sampler_kwargs(local_sampler, log_density, n_features, kwargs):
   """Sets defaults and merges user-provided adaptation keywords."""
-
-  kwargs["logpdf"] = log_density
-  sampler_kwargs, sampler_required = shared.get_default_signature(
-      local_sampler)
-  sampler_kwargs.setdefault("jit", True)
-  sampler_kwargs.update(
-      {k: kwargs[k] for k in sampler_required if k in kwargs})
-  sampler_required = sampler_required - sampler_kwargs.keys()
 
   defaults = {
       # HMC kwargs
@@ -101,7 +89,15 @@ def get_local_sampler_kwargs(local_sampler, log_density, n_features, kwargs):
       "n_leapfrog": 10,
       # Both
       "step_size": 0.1,
-  }
+      "logpdf": log_density
+  } | kwargs
+
+  sampler_kwargs, sampler_required = shared.get_default_signature(
+      local_sampler)
+  sampler_kwargs.setdefault("jit", True)
+  sampler_kwargs.update(
+      {k: defaults[k] for k in sampler_required if k in defaults})
+  sampler_required = sampler_required - sampler_kwargs.keys()
   if "params" in sampler_required:
     sampler_kwargs["params"] = defaults
   else:
@@ -120,15 +116,9 @@ def get_local_sampler_kwargs(local_sampler, log_density, n_features, kwargs):
 
 def get_sampler_kwargs(sampler, n_features, kwargs):
   """Sets defaults and merges user-provided adaptation keywords."""
-  sampler_kwargs, sampler_required = shared.get_default_signature(sampler)
-  sampler_kwargs.update(
-      {k: kwargs[k] for k in sampler_required if k in kwargs})
-  sampler_kwargs.setdefault("data", {})
-  sampler_kwargs.setdefault("n_dim", n_features)
-  sampler_required = (sampler_required -
-                      {"nf_model", "local_sampler", "rng_key_set", "kwargs"})
-  sampler_required = sampler_required - sampler_kwargs.keys()
-
+  #  We support `num_chains` everywhere else, so support it here.
+  if "num_chains" in kwargs:
+    kwargs["n_chains"] = kwargs["num_chains"]
   defaults = {
       "n_loop_training": 5,
       "n_loop_production": 5,
@@ -149,11 +139,14 @@ def get_sampler_kwargs(sampler, n_features, kwargs):
       "output_thinning": 1,
       "n_sample_max": 10_000,
       "precompile": False,
-      "verbose": False}
-  for key, value in defaults.items():
-    if key not in sampler_kwargs:
-      sampler_kwargs[key] = value
-
+      "verbose": False,
+      "n_dim": n_features,
+      "data": {}} | kwargs
+  sampler_kwargs, sampler_required = shared.get_default_signature(sampler)
+  sampler_kwargs.update(
+      {k: defaults[k] for k in sampler_required if k in defaults})
+  sampler_required = (sampler_required -
+                      {"nf_model", "local_sampler", "rng_key_set", "kwargs"})
   sampler_required = sampler_required - sampler_kwargs.keys()
 
   if sampler_required:
@@ -162,7 +155,7 @@ def get_sampler_kwargs(sampler, n_features, kwargs):
         f"{','.join(sampler_required)}. Probably file a bug, but "
         "you can try to manually supply them as keywords."
     )
-  return sampler_kwargs
+  return defaults | sampler_kwargs
 
 
 class _FlowMCSampler(shared.Base):
