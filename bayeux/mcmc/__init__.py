@@ -15,9 +15,13 @@
 """Imports from submodules."""
 # pylint: disable=g-importing-member
 # pylint: disable=g-import-not-at-top
+# pylint: disable=g-bad-import-order
 import importlib
 
-__all__ = []
+# TFP-on-JAX always installed
+from bayeux._src.mcmc.tfp import SnaperHMC as SNAPER_HMC_TFP
+__all__ = ["SNAPER_HMC_TFP"]
+
 if importlib.util.find_spec("blackjax") is not None:
   from bayeux._src.mcmc.blackjax import CheesHMC as CheesHMCblackjax
   from bayeux._src.mcmc.blackjax import HMC as HMCblackjax

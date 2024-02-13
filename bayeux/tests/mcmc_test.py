@@ -63,6 +63,20 @@ def test_return_pytree_numpyro():
   assert pytree["x"]["y"].shape == (4, 10)
 
 
+def test_return_pytree_tfp():
+  model = bx.Model(log_density=lambda pt: -pt["x"]["y"]**2,
+                   test_point={"x": {"y": jnp.array(1.)}})
+  seed = jax.random.PRNGKey(0)
+  pytree = model.mcmc.tfp_snaper_hmc(
+      seed=seed,
+      return_pytree=True,
+      num_chains=4,
+      num_results=10,
+      num_burnin_steps=10,
+  )
+  assert pytree["x"]["y"].shape == (10, 4)
+
+
 @pytest.mark.parametrize("method", METHODS)
 def test_samplers(method):
   # flowMC samplers are broken for 0 or 1 dimensions, so just test
