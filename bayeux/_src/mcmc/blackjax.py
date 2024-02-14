@@ -39,13 +39,14 @@ _ALGORITHMS = {
 
 
 def get_extra_kwargs(kwargs):
-  return {
+  defaults = {
       "chain_method": "vectorized",
       "num_chains": 8,
       "num_draws": 500,
       "num_adapt_draws": 500,
-      "return_pytree": False,
-  } | kwargs
+      "return_pytree": False}
+  shared.update_with_kwargs(defaults, kwargs=kwargs)
+  return defaults
 
 
 class _BlackjaxSampler(shared.Base):
@@ -299,7 +300,7 @@ def get_adaptation_kwargs(adaptation_algorithm, algorithm, log_density, kwargs):
     run_kwargs["optim"] = optax.adam(learning_rate=0.01)
     run_required.remove("optim")
   if "step_size" in run_required:
-    run_kwargs["step_size"] = 0.001
+    run_kwargs["step_size"] = 0.5
     run_required.remove("step_size")
   run_kwargs["num_steps"] = kwargs.get("num_adapt_draws",
                                        run_kwargs["num_steps"])
@@ -315,12 +316,8 @@ def get_algorithm_kwargs(algorithm, log_density, kwargs):
       "step_size": 0.5,
       "num_integration_steps": 16,
   } | kwargs
-  algorithm_kwargs.update(
-      {
-          k: kwargs_with_defaults[k]
-          for k in algorithm_required
-          if k in kwargs_with_defaults
-      })
+  shared.update_with_kwargs(
+      algorithm_kwargs, reqd=algorithm_required, kwargs=kwargs_with_defaults)
   algorithm_required.remove("logdensity_fn")
   algorithm_required.discard("inverse_mass_matrix")
   algorithm_required.discard("alpha")
@@ -332,11 +329,6 @@ def get_algorithm_kwargs(algorithm, log_density, kwargs):
     raise ValueError(f"Unexpected required arguments: "
                      f"{','.join(algorithm_required)}. Probably file a bug, but"
                      " you can try to manually supply them as keywords.")
-  algorithm_kwargs.update(
-      {
-          k: kwargs_with_defaults[k]
-          for k in algorithm_kwargs
-          if k in kwargs_with_defaults})
   return algorithm_kwargs
 
 

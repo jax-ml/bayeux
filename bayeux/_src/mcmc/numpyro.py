@@ -75,7 +75,8 @@ class NUTS(_NumpyroSampler):
 def get_sampler_kwargs(algorithm, kwargs):
   """Construct default args and include user arguments for samplers."""
   sampler_kwargs, sampler_required = shared.get_default_signature(algorithm)
-  sampler_kwargs.update({k: kwargs[k] for k in sampler_required if k in kwargs})
+  shared.update_with_kwargs(
+      sampler_kwargs, reqd=sampler_required, kwargs=kwargs)
   sampler_kwargs.pop("potential_fn")
 
   sampler_required = sampler_required - sampler_kwargs.keys()
@@ -84,7 +85,6 @@ def get_sampler_kwargs(algorithm, kwargs):
     raise ValueError(f"Unexpected required arguments: "
                      f"{','.join(sampler_required)}. Probably file a bug, but "
                      "you can try to manually supply them as keywords.")
-  sampler_kwargs.update({k: kwargs[k] for k in sampler_kwargs if k in kwargs})
   return sampler_kwargs
 
 
@@ -97,20 +97,14 @@ def get_mcmc_kwargs(kwargs):
       "num_chains": 8,
       "chain_method": "vectorized",
   } | kwargs
-  mcmc_kwargs.update(
-      {k: kwargs_with_defaults[k] for k in mcmc_required
-       if k in kwargs_with_defaults})
-
+  shared.update_with_kwargs(
+      mcmc_kwargs, reqd=mcmc_required, kwargs=kwargs_with_defaults)
   mcmc_required = mcmc_required - mcmc_kwargs.keys()
   mcmc_required.remove("sampler")
-
   if mcmc_required:
     raise ValueError(f"Unexpected required arguments: "
                      f"{','.join(mcmc_required)}. Probably file a bug, but "
                      "you can try to manually supply them as keywords.")
-  mcmc_kwargs.update(
-      {k: kwargs_with_defaults[k] for k in mcmc_kwargs
-       if k in kwargs_with_defaults})
   return mcmc_kwargs
 
 

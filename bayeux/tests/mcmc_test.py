@@ -79,6 +79,20 @@ def test_return_pytree_tfp():
   assert pytree["x"]["y"].shape == (10, 4)
 
 
+def test_return_pytree_tfp_nuts():
+  model = bx.Model(log_density=lambda pt: -pt["x"]["y"]**2,
+                   test_point={"x": {"y": jnp.array(1.)}})
+  seed = jax.random.PRNGKey(0)
+  pytree = model.mcmc.tfp_nuts(
+      seed=seed,
+      return_pytree=True,
+      num_chains=4,
+      num_draws=10,
+      num_adaptation_steps=10,
+  )
+  assert pytree["x"]["y"].shape == (10, 4)
+
+
 @pytest.mark.skipif(importlib.util.find_spec("flowMC") is None,
                     reason="Test requires flowMC which is not installed")
 def test_return_pytree_flowmc():

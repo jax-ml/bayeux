@@ -19,8 +19,10 @@
 import importlib
 
 # TFP-on-JAX always installed
+from bayeux._src.mcmc.tfp import HMC as HMC_TFP
+from bayeux._src.mcmc.tfp import NUTS as NUTS_TFP
 from bayeux._src.mcmc.tfp import SnaperHMC as SNAPER_HMC_TFP
-__all__ = ["SNAPER_HMC_TFP"]
+__all__ = ["HMC_TFP", "NUTS_TFP", "SNAPER_HMC_TFP"]
 
 if importlib.util.find_spec("blackjax") is not None:
   from bayeux._src.mcmc.blackjax import CheesHMC as CheesHMCblackjax

@@ -17,7 +17,7 @@
 import dataclasses
 import functools
 import inspect
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 
 from bayeux._src import debug
 from bayeux._src import initialization
@@ -35,6 +35,32 @@ def map_fn(chain_method, fn):
   elif chain_method == "sequential":
     return functools.partial(jax.tree_map, fn)
   raise ValueError(f"Chain method {chain_method} not supported.")
+
+
+def update_with_kwargs(
+    defaults: dict[str, Any],
+    *,
+    reqd: set[str] | None = None,
+    kwargs: dict[str, Any],
+):
+  """Updates a defaults dictionary, overwriting keys, but not adding new ones.
+
+  This updates `defaults` in-place.
+
+  Args:
+    defaults: Dictionary of arguments.
+    reqd: Set of allowed new keys.
+    kwargs: Dictionary of key/values to overwrite in default.
+
+  Returns:
+    The defaults dictionary. Keys will be the same as the existing ones, or from
+    the set `reqd`. Note that this is also updated in-place.
+  """
+  if reqd is None:
+    reqd = set()
+  defaults.update(
+      (k, kwargs[k]) for k in (defaults.keys() | reqd) & kwargs.keys())
+  return defaults
 
 
 def _default_init(

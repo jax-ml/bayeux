@@ -23,6 +23,11 @@ To release a new version (e.g. from `1.0.0` -> `2.0.0`):
 
 ## [Unreleased]
 
+## [0.1.8] - 2024-02-14
+
+### Add HMC and NUTS from TFP
+### Small change to blackjax default step size
+
 ## [0.1.7] - 2024-02-13
 
 ### Add SNAPER HMC from TFP
