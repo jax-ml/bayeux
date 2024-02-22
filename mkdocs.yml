@@ -90,3 +90,4 @@ nav:
         - Using with NumPyro: 'examples/numpyro_and_bayeux.ipynb'
         - Using with PyMC: 'examples/pymc_and_bayeux.ipynb'
         - Using with TFP: 'examples/tfp_and_bayeux.ipynb'
+        - Using with Dynamax: 'examples/dynamax_and_bayeux.ipynb'
