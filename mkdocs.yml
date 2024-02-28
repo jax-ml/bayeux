@@ -63,21 +63,10 @@ plugins:
     - mkdocstrings:
         handlers:
             python:
-                setup_commands:
-                    - import pytkdocs_tweaks
-                    - pytkdocs_tweaks.main()
-                    - import jaxtyping
-                    - jaxtyping.set_array_name_format("array")
-                    - import jax
-                    - jax.ShapeDtypeStruct.__module__ = "jax"
-                    - import typing
-                    - typing.Any.__module__ = "builtins"
-
                 selection:
                     inherited_members: true  # Allow looking up inherited methods
                 rendering:
                     show_root_heading: true  # actually display anything at all...
-                    show_root_full_path: true  # display "bayeux.asdf" not just "asdf"
                     show_if_no_docstring: true
                     show_signature_annotations: true
                     show_source: false  # don't include source code

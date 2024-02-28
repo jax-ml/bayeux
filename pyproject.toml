@@ -49,16 +49,11 @@ dev = [
 
 docs = [
     # Latest versions at time of writing.
-    "mkdocs==1.3.0",            # Main documentation generator.
-    "mkdocs-material==7.3.6",   # Theme
-    "pymdown-extensions==9.4",  # Markdown extensions e.g. to handle LaTeX.
-    "mkdocstrings==0.17.0",     # Autogenerate documentation from docstrings.
-    "mknotebooks==0.7.1",       # Turn Jupyter Lab notebooks into webpages.
-    "pytkdocs_tweaks==0.0.8",   # Tweaks mkdocstrings to improve various aspects
-    "jinja2==3.0.3",            # Older version. After 3.1.0 seems to be incompatible with current versions of mkdocstrings.
-    "nbconvert==6.5.0",        # | Older verson to avoid error
-    "nbformat==5.4.0",          # |
-    "pygments==2.14.0"
+    "mkdocs==1.5.3",            # Main documentation generator.
+    "mkdocs-material==9.5.11",   # Theme
+    "pymdown-extensions==10.7",  # Markdown extensions e.g. to handle LaTeX.
+    "mkdocstrings==0.24.1",     # Autogenerate documentation from docstrings.
+    "mknotebooks==0.8.0",       # Turn Jupyter Lab notebooks into webpages.
 ]
 
 [tool.pyink]
