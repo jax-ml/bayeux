@@ -23,6 +23,10 @@ To release a new version (e.g. from `1.0.0` -> `2.0.0`):
 
 ## [Unreleased]
 
+## [0.1.9] - 2024-02-27
+
+### Add programmatic access to algorithms
+
 ## [0.1.8] - 2024-02-14
 
 ### Add HMC and NUTS from TFP

@@ -36,15 +36,15 @@ _REQUIRED_KWARGS = (
 class _Namespace:
 
   def __init__(self):
-    self._fns = []
+    self.methods = []
 
   def __repr__(self):
-    return "\n".join(self._fns)
+    return "\n".join(self.methods)
 
   def __setclass__(self, clas, parent):
     kwargs = {k: getattr(parent, k) for k in _REQUIRED_KWARGS}
     setattr(self, clas.name, clas(**kwargs))
-    self._fns.append(clas.name)
+    self.methods.append(clas.name)
 
 
 def is_tfp_bijector(bij):
@@ -100,11 +100,17 @@ class Model(shared.Base):
 
   def __repr__(self):
     methods = []
-    for name in self._namespaces:
-      methods.append(name)
-      k = getattr(self, name)
-      methods.append("\t." + "\n\t.".join(str(k).split()))
+    for key, values in self.methods.items():
+      methods.append(key)
+      methods.append("\t." + "\n\t.".join(values))
     return "\n".join(methods)
+
+  @property
+  def methods(self):
+    methods = {}
+    for name in self._namespaces:
+      methods[name] = getattr(self, name).methods
+    return methods
 
   @classmethod
   def from_tfp(cls, pinned_joint_distribution, initial_state=None):

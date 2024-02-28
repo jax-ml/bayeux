@@ -86,6 +86,9 @@ plugins:
 
 nav:
     - 'index.md'
+    - Defining models: 'inference.md'
+    - Inspecting models and inference: 'inspecting.md'
+    - Debug Mode: 'debug_mode.md'
     - Examples:
         - Using with NumPyro: 'examples/numpyro_and_bayeux.ipynb'
         - Using with PyMC: 'examples/pymc_and_bayeux.ipynb'
