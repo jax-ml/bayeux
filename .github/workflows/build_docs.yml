@@ -28,5 +28,5 @@ jobs:
 
       - name: Upload docs
         run: |
-          mkdocs build  # twice, see https://github.com/patrick-kidger/pytkdocs_tweaks
+          mkdocs build
           mkdocs gh-deploy --force
