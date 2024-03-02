@@ -14,7 +14,7 @@ pip install bayeux-ml
 ```
 ## Quickstart
 
-We define a model by providing a log density in JAX. This could be defined using a probabilistic programming language (PPL) like [numpyro](/examples/numpyro_and_bayeux), [PyMC](/examples/pymc_and_bayeux), [TFP](/examples/tfp_and_bayeux), distrax, oryx, coix, or directly in JAX.
+We define a model by providing a log density in JAX. This could be defined using a probabilistic programming language (PPL) like [numpyro](examples/numpyro_and_bayeux), [PyMC](examples/pymc_and_bayeux), [TFP](examples/tfp_and_bayeux), distrax, oryx, coix, or directly in JAX.
 
 ```python
 import bayeux as bx
@@ -35,10 +35,10 @@ surrogate_posterior, loss = normal_density.vi.tfp_factored_surrogate_posterior(s
 
 ## Read more
 
-* [Defining models](/inference)
-* [Inspecting models](/inspecting)
-* [Testing and debugging](/debug_mode)
-* Also see `bayeux` integration with [numpyro](/examples/numpyro_and_bayeux), [PyMC](/examples/pymc_and_bayeux), and [TFP](/examples/tfp_and_bayeux)!
+* [Defining models](inference)
+* [Inspecting models](inspecting)
+* [Testing and debugging](debug_mode)
+* Also see `bayeux` integration with [numpyro](examples/numpyro_and_bayeux), [PyMC](examples/pymc_and_bayeux), and [TFP](examples/tfp_and_bayeux)!
 
 
 *This is not an officially supported Google product.*
