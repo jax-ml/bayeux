@@ -79,7 +79,8 @@ nav:
     - Inspecting models and inference: 'inspecting.md'
     - Debug Mode: 'debug_mode.md'
     - Examples:
+        - Using with Dynamax: 'examples/dynamax_and_bayeux.ipynb'
         - Using with NumPyro: 'examples/numpyro_and_bayeux.ipynb'
+        - Using with Oryx: 'examples/oryx_and_bayeux.ipynb'
         - Using with PyMC: 'examples/pymc_and_bayeux.ipynb'
         - Using with TFP: 'examples/tfp_and_bayeux.ipynb'
-        - Using with Dynamax: 'examples/dynamax_and_bayeux.ipynb'
