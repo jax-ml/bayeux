@@ -40,7 +40,7 @@ def map_fn(chain_method, fn):
 def update_with_kwargs(
     defaults: dict[str, Any],
     *,
-    reqd: set[str] | None = None,
+    reqd: Optional[set[str]] = None,
     kwargs: dict[str, Any],
 ):
   """Updates a defaults dictionary, overwriting keys, but not adding new ones.
