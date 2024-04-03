@@ -23,6 +23,10 @@ To release a new version (e.g. from `1.0.0` -> `2.0.0`):
 
 ## [Unreleased]
 
+## [0.1.10] - 2024-04-03
+
+### Keep Python 3.9 compatibility.
+
 ## [0.1.9] - 2024-02-27
 
 ### Add programmatic access to algorithms
@@ -64,7 +68,10 @@ To release a new version (e.g. from `1.0.0` -> `2.0.0`):
 
 ### Initial release
 
-[Unreleased]: https://github.com/jax-ml/bayeux/compare/v0.1.7...HEAD
+[Unreleased]: https://github.com/jax-ml/bayeux/compare/v0.1.10...HEAD
+[0.1.10]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.10
+[0.1.9]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.9
+[0.1.8]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.8
 [0.1.7]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.7
 [0.1.6]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.6
 [0.1.5]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.5

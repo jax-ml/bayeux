@@ -24,6 +24,7 @@ dependencies = [
   "flowmc",
   "numpyro",
   "jaxopt",
+  "scipy<1.13",  # https://github.com/arviz-devs/arviz/issues/2336
 ]
 
 # `version` is automatically set by flit to use `bayeux.__version__`
