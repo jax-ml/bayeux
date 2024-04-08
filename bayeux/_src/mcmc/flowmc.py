@@ -31,9 +31,9 @@ import arviz as az
 from bayeux._src import shared
 from flowMC.nfmodel import realNVP
 from flowMC.nfmodel import rqSpline
-from flowMC.sampler import HMC
-from flowMC.sampler import MALA
-from flowMC.sampler import Sampler
+from flowMC.proposal import HMC
+from flowMC.proposal import MALA
+from flowMC import Sampler
 import jax
 import jax.numpy as jnp
 
@@ -98,11 +98,8 @@ def get_local_sampler_kwargs(local_sampler, log_density, n_features, kwargs):
   sampler_kwargs.update(
       {k: defaults[k] for k in sampler_required if k in defaults})
   sampler_required = sampler_required - sampler_kwargs.keys()
-  if "params" in sampler_required:
-    sampler_kwargs["params"] = defaults
-  else:
-    sampler_kwargs["params"] = sampler_kwargs["params"] | defaults
-
+  sampler_kwargs.update(
+    {k: defaults[k] for k in sampler_kwargs if k in defaults})
   sampler_required = sampler_required - sampler_kwargs.keys()
 
   if sampler_required:
@@ -146,7 +143,7 @@ def get_sampler_kwargs(sampler, n_features, kwargs):
   sampler_kwargs.update(
       {k: defaults[k] for k in sampler_required if k in defaults})
   sampler_required = (sampler_required -
-                      {"nf_model", "local_sampler", "rng_key_set", "kwargs"})
+                      {"nf_model", "local_sampler", "rng_key", "kwargs"})
   sampler_required = sampler_required - sampler_kwargs.keys()
 
   if sampler_required:
@@ -208,16 +205,11 @@ class _FlowMCSampler(shared.Base):
     nf_model = _NF_MODELS[self.nf_model]
     local_sampler = _LOCAL_SAMPLERS[self.local_sampler]
 
-    rng_key_init, rng_key_mcmc, rng_key_nf = jax.random.split(seed, 3)
-    rng_keys_mcmc = jax.random.split(rng_key_mcmc, num_chains)
-    rng_keys_nf, init_rng_keys_nf = jax.random.split(rng_key_nf, 2)
-
     model = nf_model(key=nf_key, **kwargs[nf_model])
     local_sampler = local_sampler(**kwargs[local_sampler])
     sampler = Sampler.Sampler
     nf_sampler = sampler(
-        rng_key_set=(
-            rng_key_init, rng_keys_mcmc, rng_keys_nf, init_rng_keys_nf),
+        rng_key=seed,
         local_sampler=local_sampler,
         nf_model=model,
         **kwargs[sampler])

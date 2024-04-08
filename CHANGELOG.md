@@ -23,6 +23,12 @@ To release a new version (e.g. from `1.0.0` -> `2.0.0`):
 
 ## [Unreleased]
 
+## [0.1.11] - 2024-04-08
+
+### Update for new version of flowMC
+### Unpin scipy
+### Add pymc as dependency
+
 ## [0.1.10] - 2024-04-03
 
 ### Keep Python 3.9 compatibility.

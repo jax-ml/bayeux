@@ -116,13 +116,13 @@ def test_return_pytree_flowmc():
 def test_samplers(method):
   # flowMC samplers are broken for 0 or 1 dimensions, so just test
   # everything on 2 dimensions for now.
-  model = bx.Model(log_density=lambda pt: jnp.sum(-pt["x"]**2),
-                   test_point={"x": jnp.ones((1, 2))})
+  model = bx.Model(log_density=lambda pt: -pt["x"]**2,
+                   test_point={"x": 1.})
   sampler = getattr(model.mcmc, method)
   seed = jax.random.PRNGKey(0)
   assert sampler.debug(seed=seed, verbosity=0)
   idata = sampler(seed=seed)
-  if method == "blackjax_hmc":
+  if method.endswith("hmc"):
     assert max_rhat(idata) < 1.2
   else:
     assert max_rhat(idata) < 1.1
