@@ -51,6 +51,8 @@ def get_optimizer_kwargs(optimizer, kwargs, ignore_required=None):
         f"{','.join(optimizer_required)}. Probably file a bug, but "
         "you can try to manually supply them as keywords."
     )
+  optimizer_kwargs.update(
+      {k: kwargs[k] for k in optimizer_kwargs if k in kwargs})
   return optimizer_kwargs
 
 

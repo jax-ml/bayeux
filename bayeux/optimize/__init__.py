@@ -26,28 +26,6 @@ if importlib.util.find_spec("jaxopt") is not None:
   from bayeux._src.optimize.jaxopt import NonlinearCG
   __all__.extend(["BFGS", "GradientDescent", "LBFGS", "NonlinearCG"])
 
-if importlib.util.find_spec("optimistix") is not None:
-  from bayeux._src.optimize.optimistix import BFGS as optimistix_BFGS
-  from bayeux._src.optimize.optimistix import Chord
-  from bayeux._src.optimize.optimistix import Dogleg
-  from bayeux._src.optimize.optimistix import GaussNewton
-  from bayeux._src.optimize.optimistix import IndirectLevenbergMarquardt
-  from bayeux._src.optimize.optimistix import LevenbergMarquardt
-  from bayeux._src.optimize.optimistix import NelderMead
-  from bayeux._src.optimize.optimistix import Newton
-  from bayeux._src.optimize.optimistix import NonlinearCG as optimistix_NonlinearCG
-
-  __all__.extend([
-      "optimistix_BFGS",
-      "Chord",
-      "Dogleg",
-      "GaussNewton",
-      "IndirectLevenbergMarquardt",
-      "LevenbergMarquardt",
-      "NelderMead",
-      "Newton",
-      "optimistix_NonlinearCG"])
-
 if importlib.util.find_spec("optax") is not None:
   from bayeux._src.optimize.optax import AdaBelief
   from bayeux._src.optimize.optax import Adafactor
@@ -92,3 +70,13 @@ if importlib.util.find_spec("optax") is not None:
       "Sm3",
       "Yogi",
       ])
+
+if importlib.util.find_spec("optimistix") is not None:
+  from bayeux._src.optimize.optimistix import BFGS as optimistix_BFGS
+  from bayeux._src.optimize.optimistix import NelderMead
+  from bayeux._src.optimize.optimistix import NonlinearCG as optimistix_NonlinearCG
+
+  __all__.extend([
+      "optimistix_BFGS",
+      "NelderMead",
+      "optimistix_NonlinearCG"])

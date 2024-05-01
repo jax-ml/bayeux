@@ -70,39 +70,9 @@ class BFGS(_OptimistixOptimizer):
   optimizer = "BFGS"
 
 
-class Chord(_OptimistixOptimizer):
-  name = "optimistix_chord"
-  optimizer = "Chord"
-
-
-class Dogleg(_OptimistixOptimizer):
-  name = "optimistix_dogleg"
-  optimizer = "Dogleg"
-
-
-class GaussNewton(_OptimistixOptimizer):
-  name = "optimistix_gauss_newton"
-  optimizer = "GaussNewton"
-
-
-class IndirectLevenbergMarquardt(_OptimistixOptimizer):
-  name = "optimistix_indirect_levenberg_marquardt"
-  optimizer = "IndirectLevenbergMarquardt"
-
-
-class LevenbergMarquardt(_OptimistixOptimizer):
-  name = "optimistix_levenberg_marquardt"
-  optimizer = "LevenbergMarquardt"
-
-
 class NelderMead(_OptimistixOptimizer):
   name = "optimistix_nelder_mead"
   optimizer = "NelderMead"
-
-
-class Newton(_OptimistixOptimizer):
-  name = "optimistix_newton"
-  optimizer = "Newton"
 
 
 class NonlinearCG(_OptimistixOptimizer):
