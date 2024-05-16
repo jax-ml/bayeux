@@ -33,7 +33,7 @@ def map_fn(chain_method, fn):
   elif chain_method == "vectorized":
     return jax.vmap(fn)
   elif chain_method == "sequential":
-    return functools.partial(jax.tree_map, fn)
+    return functools.partial(jax.tree.map, fn)
   raise ValueError(f"Chain method {chain_method} not supported.")
 
 

@@ -30,7 +30,7 @@ class Custom(tfb.Bijector):
 
   def __init__(self, bx_model):
     super().__init__(
-        forward_min_event_ndims=jax.tree_map(jnp.ndim, bx_model.test_point))
+        forward_min_event_ndims=jax.tree.map(jnp.ndim, bx_model.test_point))
     self.bx_model = bx_model
 
   def _forward(self, x):
@@ -46,12 +46,12 @@ class Custom(tfb.Bijector):
     return -self.inverse_log_det_jacobian(self.forward(x))
 
   def _forward_event_shape_tensor(self, input_shape):
-    return jax.tree_map(jnp.shape,
-                        self._forward(jax.tree_map(jnp.ones, input_shape)))
+    return jax.tree.map(jnp.shape,
+                        self._forward(jax.tree.map(jnp.ones, input_shape)))
 
   def _inverse_event_shape_tensor(self, output_shape):
-    return jax.tree_map(jnp.shape,
-                        self._inverse(jax.tree_map(jnp.ones, output_shape)))
+    return jax.tree.map(jnp.shape,
+                        self._inverse(jax.tree.map(jnp.ones, output_shape)))
 
 
 def get_fit_kwargs(log_density, kwargs):
@@ -104,7 +104,7 @@ class Factored(shared.Base):
     return {
         tfp.experimental.vi.build_factored_surrogate_posterior_stateless: (
             get_build_kwargs(
-                jax.tree_map(jnp.shape, self.test_point),
+                jax.tree.map(jnp.shape, self.test_point),
                 self.constraining_bijector(),
                 kwargs)),
         tfp.vi.fit_surrogate_posterior_stateless: get_fit_kwargs(
@@ -140,7 +140,7 @@ class Factored(shared.Base):
     elif chain_method == "parallel":
       mapped_fit = jax.pmap(fit_fn)
     elif chain_method == "sequential":
-      mapped_fit = functools.partial(jax.tree_map, fit_fn)
+      mapped_fit = functools.partial(jax.tree.map, fit_fn)
     else:
       raise ValueError(f"Chain method {chain_method} not supported.")
 
