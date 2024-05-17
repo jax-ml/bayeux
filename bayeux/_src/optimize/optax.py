@@ -18,14 +18,16 @@ import functools
 from bayeux._src.optimize import shared
 import jax
 import optax
+import optax.contrib
 
 
 class _OptaxOptimizer(shared.Optimizer):
   """Base class for optax optimizers."""
+  _base = optax
 
   def get_kwargs(self, **kwargs):
     kwargs = self.default_kwargs() | kwargs
-    optimizer = getattr(optax, self.optimizer)
+    optimizer = getattr(self._base, self.optimizer)
     return {optimizer: shared.get_optimizer_kwargs(optimizer, kwargs),
             "extra_parameters": shared.get_extra_kwargs(kwargs)}
 
@@ -33,7 +35,7 @@ class _OptaxOptimizer(shared.Optimizer):
     kwargs = self.get_kwargs(**kwargs)
     fun, initial_state, apply_transform = self._prep_args(seed, kwargs)
 
-    optimizer_fn = getattr(optax, self.optimizer)
+    optimizer_fn = getattr(self._base, self.optimizer)
     optimizer = optimizer_fn(**kwargs[optimizer_fn])
     num_iters = kwargs["extra_parameters"]["num_iters"]
     optimizer = functools.partial(
@@ -180,6 +182,19 @@ class Rmsprop(_OptaxOptimizer):
   def default_kwargs(self) -> dict[str, float]:
     kwargs = super().default_kwargs()
     kwargs["learning_rate"] = 1e-4
+    return kwargs
+
+
+class ScheduleFree(_OptaxOptimizer):
+  _base = optax.contrib
+  name = "optax_schedule_free"
+  optimizer = "schedule_free"
+
+  def default_kwargs(self) -> dict[str, float]:
+    kwargs = super().default_kwargs()
+    base_optimizer = optax.adam(
+        **shared.get_optimizer_kwargs(optax.adam, kwargs))
+    kwargs["base_optimizer"] = base_optimizer
     return kwargs
 
 

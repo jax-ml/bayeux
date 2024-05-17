@@ -44,6 +44,7 @@ if importlib.util.find_spec("optax") is not None:
   # from bayeux._src.optimize.optax import OptimisticGradientDescent  # pylint: disable=line-too-long
   from bayeux._src.optimize.optax import Radam
   from bayeux._src.optimize.optax import Rmsprop
+  from bayeux._src.optimize.optax import ScheduleFree
   from bayeux._src.optimize.optax import Sgd
   from bayeux._src.optimize.optax import Sm3
   from bayeux._src.optimize.optax import Yogi
@@ -66,6 +67,7 @@ if importlib.util.find_spec("optax") is not None:
       # "Dpsgd",
       "Radam",
       "Rmsprop",
+      "ScheduleFree",
       "Sgd",
       "Sm3",
       "Yogi",
