@@ -15,7 +15,7 @@
 """Imports from submodules."""
 # pylint: disable=g-importing-member
 # pylint: disable=g-import-not-at-top
-import importlib
+import importlib.util
 
 __all__ = []
 
@@ -44,7 +44,9 @@ if importlib.util.find_spec("optax") is not None:
   # from bayeux._src.optimize.optax import OptimisticGradientDescent  # pylint: disable=line-too-long
   from bayeux._src.optimize.optax import Radam
   from bayeux._src.optimize.optax import Rmsprop
-  from bayeux._src.optimize.optax import ScheduleFree
+  if importlib.util.find_spec("optax.contrib._schedule_free") is not None:
+    from bayeux._src.optimize.optax import ScheduleFree
+    __all__.append("ScheduleFree")
   from bayeux._src.optimize.optax import Sgd
   from bayeux._src.optimize.optax import Sm3
   from bayeux._src.optimize.optax import Yogi
@@ -67,7 +69,6 @@ if importlib.util.find_spec("optax") is not None:
       # "Dpsgd",
       "Radam",
       "Rmsprop",
-      "ScheduleFree",
       "Sgd",
       "Sm3",
       "Yogi",
