@@ -21,7 +21,11 @@ To release a new version (e.g. from `1.0.0` -> `2.0.0`):
 
 -->
 
-## [Unreleased]
+## [0.1.12] - 2024-05-23
+
+* Add schedule free Adam optimizer
+* Replace jax.tree_* with jax.tree.*
+* Remove optimistix fixed point finders from API
 
 ## [0.1.11] - 2024-04-08
 
