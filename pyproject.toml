@@ -25,6 +25,7 @@ dependencies = [
   "numpyro",
   "jaxopt",
   "pymc",
+  "nutpie",
 ]
 
 # `version` is automatically set by flit to use `bayeux.__version__`

@@ -112,6 +112,23 @@ def test_return_pytree_flowmc():
   assert pytree["x"]["y"].shape == (4, 10, 2)
 
 
+@pytest.mark.skipif(importlib.util.find_spec("nutpie") is None,
+                    reason="Test requires nutpie which is not installed")
+def test_return_pytree_nutpie():
+  model = bx.Model(log_density=lambda pt: -jnp.sum(pt["x"]["y"]**2),
+                   test_point={"x": {"y": jnp.array([1., 1.])}})
+  seed = jax.random.PRNGKey(0)
+  pytree = model.mcmc.nutpie(
+      seed=seed,
+      return_pytree=True,
+      chains=4,
+      draws=10,
+      tune=10,
+  )
+  # 10 draws = (1 local + 1 global) * 5 loops
+  assert pytree["x"]["y"].shape == (4, 10, 2)
+
+
 @pytest.mark.parametrize("method", METHODS)
 def test_samplers(method):
   # flowMC samplers are broken for 0 or 1 dimensions, so just test

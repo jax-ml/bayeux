@@ -522,7 +522,7 @@ def debug_no_ildj(
 
 def _get_num_chains(default_kwargs):
   for v in default_kwargs.values():
-    for key in ("num_chains", "num_particles", "batch_size"):
+    for key in ("num_chains", "num_particles", "batch_size", "chains"):
       if key in v:
         return v[key]
   raise KeyError("No `num_chains` in default kwargs!")

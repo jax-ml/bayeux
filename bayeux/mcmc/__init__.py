@@ -52,3 +52,9 @@ if importlib.util.find_spec("numpyro") is not None:
   from bayeux._src.mcmc.numpyro import NUTS as NUTSnumpyro
 
   __all__.extend(["HMCnumpyro", "NUTSnumpyro"])
+
+if importlib.util.find_spec("nutpie") is not None:
+  from bayeux._src.mcmc.nutpie import _NutpieSampler as NutpieSampler
+
+  __all__.extend(["NutpieSampler"])
+
