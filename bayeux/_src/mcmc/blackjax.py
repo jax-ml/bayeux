@@ -198,13 +198,17 @@ def _blackjax_inference(
 
   algorithm_kwargs = kwargs[_convert_algorithm(algorithm)] | adapt_parameters
   inference_algorithm = algorithm(**algorithm_kwargs)
-  _, states, infos = blackjax.util.run_inference_algorithm(
+  # This is protecting against a change in blackjax where the
+  # return from `run_inference_algorithm` changes from
+  # `_, states, infos` to `_, (states, infos)`. This one weird
+  # trick handles both cases.
+  _, *states_and_infos = blackjax.util.run_inference_algorithm(
       rng_key=seed,
       inference_algorithm=inference_algorithm,
       num_steps=num_draws,
       progress_bar=False,
       **{_INFERENCE_KWARG: adapt_state})
-  return states, infos
+  return states_and_infos
 
 
 def _blackjax_inference_loop(

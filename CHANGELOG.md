@@ -21,6 +21,10 @@ To release a new version (e.g. from `1.0.0` -> `2.0.0`):
 
 -->
 
+## [0.1.13] - 2024-08-13
+
+* Prepare for more blackjax API changes.
+
 ## [0.1.13] - 2024-07-10
 
 * Prepare for blackjax API change.
