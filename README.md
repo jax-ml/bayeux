@@ -38,7 +38,7 @@ surrogate_posterior, loss = normal_density.vi.tfp_factored_surrogate_posterior(s
 * [Defining models](docs/inference.md)
 * [Inspecting models](docs/inspecting.md)
 * [Testing and debugging](docs/debug_mode.md)
-* Also see `bayeux` integration with [numpyro](docs/examples/numpyro_and_bayeux), [PyMC](docs/examples/pymc_and_bayeux), and [TFP](docs/examples/tfp_and_bayeux)!
+* Also see `bayeux` integration with [numpyro](docs/examples/numpyro_and_bayeux.ipynb), [PyMC](docs/examples/pymc_and_bayeux.ipynb), and [TFP](docs/examples/tfp_and_bayeux.ipynb)!
 
 
 *This is not an officially supported Google product.*
