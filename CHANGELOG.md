@@ -21,6 +21,12 @@ To release a new version (e.g. from `1.0.0` -> `2.0.0`):
 
 -->
 
+## [0.1.15] - 2024-12-10
+
+* Drop Python 3.9 (b/c JAX did)
+* Update requirements for new JAX version
+* Add nutpie sampler
+
 ## [0.1.13] - 2024-08-13
 
 * Prepare for more blackjax API changes.
@@ -86,7 +92,8 @@ To release a new version (e.g. from `1.0.0` -> `2.0.0`):
 
 ### Initial release
 
-[Unreleased]: https://github.com/jax-ml/bayeux/compare/v0.1.10...HEAD
+[Unreleased]: https://github.com/jax-ml/bayeux/compare/v0.1.15...HEAD
+[0.1.15]: https://github.com/jax-ml/bayeux/compare/v0.1.15
 [0.1.10]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.10
 [0.1.9]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.9
 [0.1.8]: https://github.com/jax-ml/bayeux/releases/tag/v0.1.8

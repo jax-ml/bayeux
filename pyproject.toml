@@ -2,7 +2,7 @@
 name = "bayeux-ml"
 description = "Stitching together probabilistic models and inference."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = {file = "LICENSE"}
 authors = [{name = "bayeux authors", email="bayeux@google.com"}]
 classifiers = [  # List of https://pypi.org/classifiers/
@@ -14,9 +14,9 @@ keywords = []
 # pip dependencies of the project
 # Installed locally with `pip install -e .`
 dependencies = [
-  "jax>=0.4.6",
+  "jax>=0.4.36",
   "tensorflow-probability[jax]>=0.19.0",
-  "oryx>=0.2.7",
+  "oryx>=0.2.9",
   "arviz",
   "optax",
   "optimistix",
