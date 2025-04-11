@@ -22,6 +22,8 @@ import jax.numpy as jnp
 import pytest
 import tensorflow_probability.substrates.jax as tfp
 
+jax.config.update("jax_threefry_partitionable", False)
+
 tfd = tfp.distributions
 
 METHODS = [getattr(bx.mcmc, k).name for k in bx.mcmc.__all__]
