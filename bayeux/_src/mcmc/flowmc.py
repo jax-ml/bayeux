@@ -30,10 +30,10 @@
 import arviz as az
 from bayeux._src import shared
 from flowMC import Sampler
-from flowMC.nfmodel import realNVP
-from flowMC.nfmodel import rqSpline
-from flowMC.proposal import HMC
-from flowMC.proposal import MALA
+from flowMC.resource.nf_model import realNVP
+from flowMC.resource.nf_model import rqSpline
+from flowMC.resource.local_kernel import HMC
+from flowMC.resource.local_kernel import MALA
 import jax
 import jax.numpy as jnp
 
