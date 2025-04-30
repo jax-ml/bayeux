@@ -35,18 +35,6 @@ if importlib.util.find_spec("blackjax") is not None:
                   "NUTSblackjax", "HMC_Pathfinder_blackjax",
                   "NUTS_Pathfinder_blackjax"])
 
-if importlib.util.find_spec("flowMC") is not None:
-  from bayeux._src.mcmc.flowmc import MaskedCouplingRQSplineHMC as MaskedCouplingRQSplineHMCflowmc
-  from bayeux._src.mcmc.flowmc import MaskedCouplingRQSplineMALA as MaskedCouplingRQSplineMALAflowmc
-  from bayeux._src.mcmc.flowmc import RealNVPHMC as RealNVPHMCflowmc
-  from bayeux._src.mcmc.flowmc import RealNVPMALA as RealNVPMALAflowmc
-
-  __all__.extend([
-      "MaskedCouplingRQSplineHMCflowmc",
-      "MaskedCouplingRQSplineMALAflowmc",
-      "RealNVPHMCflowmc",
-      "RealNVPMALAflowmc"])
-
 if importlib.util.find_spec("numpyro") is not None:
   from bayeux._src.mcmc.numpyro import HMC as HMCnumpyro
   from bayeux._src.mcmc.numpyro import NUTS as NUTSnumpyro

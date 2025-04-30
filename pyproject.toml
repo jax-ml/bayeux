@@ -21,7 +21,6 @@ dependencies = [
   "optax",
   "optimistix",
   "blackjax",
-  "flowmc>=0.3.0",
   "numpyro",
   "jaxopt",
   "pymc",
