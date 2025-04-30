@@ -70,10 +70,6 @@ normal_model.methods
   'blackjax_nuts',
   'blackjax_hmc_pathfinder',
   'blackjax_nuts_pathfinder',
-  'flowmc_rqspline_hmc',
-  'flowmc_rqspline_mala',
-  'flowmc_realnvp_hmc',
-  'flowmc_realnvp_mala',
   'numpyro_hmc',
   'numpyro_nuts'],
  'optimize': ['jaxopt_bfgs',
@@ -124,10 +120,6 @@ mcmc
     .blackjax_nuts
     .blackjax_hmc_pathfinder
     .blackjax_nuts_pathfinder
-    .flowmc_rqspline_hmc
-    .flowmc_rqspline_mala
-    .flowmc_realnvp_hmc
-    .flowmc_realnvp_mala
     .numpyro_hmc
     .numpyro_nuts
 optimize
@@ -216,10 +208,6 @@ blackjax_meads_hmc
 blackjax_nuts
 blackjax_hmc_pathfinder
 blackjax_nuts_pathfinder
-flowmc_rqspline_hmc
-flowmc_rqspline_mala
-flowmc_realnvp_hmc
-flowmc_realnvp_mala
 numpyro_hmc
 numpyro_nuts
 ```

@@ -95,25 +95,6 @@ def test_return_pytree_tfp_nuts():
   assert pytree["x"]["y"].shape == (10, 4)
 
 
-@pytest.mark.skipif(importlib.util.find_spec("flowMC") is None,
-                    reason="Test requires flowMC which is not installed")
-def test_return_pytree_flowmc():
-  model = bx.Model(log_density=lambda pt: -jnp.sum(pt["x"]["y"]**2),
-                   test_point={"x": {"y": jnp.array([1., 1.])}})
-  seed = jax.random.PRNGKey(0)
-  pytree = model.mcmc.flowmc_realnvp_mala(
-      seed=seed,
-      return_pytree=True,
-      n_chains=4,
-      n_local_steps=1,
-      n_global_steps=1,
-      n_loop_training=1,
-      n_loop_production=5,
-  )
-  # 10 draws = (1 local + 1 global) * 5 loops
-  assert pytree["x"]["y"].shape == (4, 10, 2)
-
-
 @pytest.mark.skipif(importlib.util.find_spec("nutpie") is None,
                     reason="Test requires nutpie which is not installed")
 def test_return_pytree_nutpie():
