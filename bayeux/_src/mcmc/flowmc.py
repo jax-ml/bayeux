@@ -1,4 +1,4 @@
-# Copyright 2024 The bayeux Authors.
+# Copyright 2025 The bayeux Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,10 +30,10 @@
 import arviz as az
 from bayeux._src import shared
 from flowMC import Sampler
-from flowMC.resource.nf_model import realNVP
-from flowMC.resource.nf_model import rqSpline
-from flowMC.resource.local_kernel import HMC
-from flowMC.resource.local_kernel import MALA
+from flowMC.nfmodel import realNVP
+from flowMC.nfmodel import rqSpline
+from flowMC.proposal import HMC
+from flowMC.proposal import MALA
 import jax
 import jax.numpy as jnp
 
