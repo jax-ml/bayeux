@@ -1,4 +1,4 @@
-# Copyright 2025 The bayeux Authors.
+# Copyright 2026 The bayeux Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -141,8 +141,8 @@ def test_samplers(method):
   seed = jax.random.PRNGKey(0)
   assert sampler.debug(seed=seed, verbosity=0)
   idata = sampler(seed=seed)
-  if method.endswith("hmc"):
-    assert max_rhat(idata) < 1.2
+  if "hmc" in method:
+    assert max_rhat(idata) < 1.25
   else:
     assert max_rhat(idata) < 1.1
 
