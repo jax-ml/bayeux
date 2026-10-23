@@ -1,4 +1,4 @@
-# Copyright 2025 The bayeux Authors.
+# Copyright 2026 The bayeux Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
 
 """Tests for the API."""
 import importlib
+import inspect
+from unittest import mock
 
 import arviz as az
 import bayeux as bx
@@ -27,6 +29,7 @@ jax.config.update("jax_threefry_partitionable", False)
 tfd = tfp.distributions
 
 METHODS = [getattr(bx.mcmc, k).name for k in bx.mcmc.__all__]
+_FIXED_LENGTH_BLACKJAX_HMC = ("blackjax_hmc", "blackjax_hmc_pathfinder")
 
 
 def max_rhat(idata):
@@ -140,7 +143,13 @@ def test_samplers(method):
   sampler = getattr(model.mcmc, method)
   seed = jax.random.PRNGKey(0)
   assert sampler.debug(seed=seed, verbosity=0)
-  idata = sampler(seed=seed)
+  # Fixed-length blackjax HMC (fixed step size and number of integration steps)
+  # is periodic on this 1-D Gaussian: for some adapted step sizes chains just
+  # oscillate between x and -x and never mix. Use the opt-in step size jitter,
+  # which is the standard fix (Neal 2011, Sec. 5.4.2.2), when testing them.
+  kwargs = ({"step_size_jitter": 0.2} if method in _FIXED_LENGTH_BLACKJAX_HMC
+            else {})
+  idata = sampler(seed=seed, **kwargs)
   if method.endswith("hmc"):
     assert max_rhat(idata) < 1.2
   else:
@@ -180,3 +189,70 @@ def test_tfp_bijectors():
       transform_fn=pinned_model.experimental_default_event_space_bijector())
   assert model.mcmc.blackjax_nuts.debug(seed=jax.random.PRNGKey(2),
                                         verbosity=10)
+
+
+def test_blackjax_run_inference_extra_kwargs_match_signature():
+  blackjax = pytest.importorskip("blackjax")
+  from bayeux._src.mcmc import blackjax as bx_blackjax  # pylint: disable=g-import-not-at-top
+  params = inspect.signature(blackjax.util.run_inference_algorithm).parameters
+  expected = {"progress_bar": False} if "progress_bar" in params else {}
+  assert bx_blackjax._get_run_inference_algorithm_extra_kwargs() == expected  # pylint: disable=protected-access
+
+
+def test_blackjax_inference_drops_private_adaptation_parameters():
+  pytest.importorskip("blackjax")
+  from bayeux._src.mcmc import blackjax as bx_blackjax  # pylint: disable=g-import-not-at-top
+  captured = {}
+
+  def fake_algorithm(**kwargs):
+    captured.update(kwargs)
+    return "inference_algorithm"
+
+  def fake_run_inference_algorithm(**unused_kwargs):
+    return "final_state", ("states", "infos")
+
+  with mock.patch.object(bx_blackjax.blackjax.util, "run_inference_algorithm",
+                         fake_run_inference_algorithm):
+    ret = bx_blackjax._blackjax_inference(  # pylint: disable=protected-access
+        jax.random.PRNGKey(0),
+        adapt_state="adapt_state",
+        adapt_parameters={"step_size": 0.1, "_private_diagnostic": 1.0},
+        algorithm=fake_algorithm,
+        num_draws=1,
+        kwargs={fake_algorithm: {"num_integration_steps": 3}})
+
+  assert ret == ("states", "infos")
+  assert captured == {"num_integration_steps": 3, "step_size": 0.1}
+
+
+def test_blackjax_step_size_jitter_is_opt_in():
+  pytest.importorskip("blackjax")
+  model = bx.Model(log_density=lambda pt: -pt["x"]**2,
+                   test_point={"x": 1.})
+  sampler = model.mcmc.blackjax_hmc
+  # Off by default.
+  assert sampler.get_kwargs()["extra_parameters"]["step_size_jitter"] == 0.0
+  # Used when requested.
+  kwargs = sampler.get_kwargs(step_size_jitter=0.2)
+  assert kwargs["extra_parameters"]["step_size_jitter"] == 0.2
+
+  idata = sampler(
+      seed=jax.random.PRNGKey(0),
+      step_size_jitter=0.2,
+      num_chains=2,
+      num_draws=50,
+      num_adapt_draws=50)
+  assert idata.posterior["x"].shape == (2, 50)
+
+
+def test_blackjax_step_size_jitter_validates_range():
+  pytest.importorskip("blackjax")
+  model = bx.Model(log_density=lambda pt: -pt["x"]**2,
+                   test_point={"x": 1.})
+  with pytest.raises(ValueError, match="step_size_jitter"):
+    model.mcmc.blackjax_hmc(
+        seed=jax.random.PRNGKey(0),
+        step_size_jitter=1.5,
+        num_chains=2,
+        num_draws=10,
+        num_adapt_draws=10)
