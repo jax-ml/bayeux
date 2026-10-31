@@ -41,6 +41,59 @@ def _get_run_inference_algorithm_kwarg_name():
 _INFERENCE_KWARG = _get_run_inference_algorithm_kwarg_name()
 
 
+def _get_run_inference_algorithm_extra_kwargs():
+  """Returns extra kwargs supported by `blackjax.util.run_inference_algorithm`.
+
+  Newer blackjax versions (>= 1.7) removed the `progress_bar` argument, so only
+  pass it when the installed version still accepts it.
+
+  TODO: b/573285014 - Remove once blackjax < 1.7 is no longer supported.
+  """
+  defaults, req = shared.get_default_signature(
+      blackjax.util.run_inference_algorithm)
+  if "progress_bar" in defaults or "progress_bar" in req:
+    return {"progress_bar": False}
+  return {}
+_INFERENCE_EXTRA_KWARGS = _get_run_inference_algorithm_extra_kwargs()
+
+
+def _with_jittered_step_size(algorithm, algorithm_kwargs, step_size_jitter):
+  """Returns `algorithm(**algorithm_kwargs)` with a per-iteration jittered step.
+
+  HMC with a fixed number of integration steps and a fixed step size can be
+  periodic (non-ergodic): for near-Gaussian targets, some step sizes make every
+  trajectory land near the reflection of its starting point, so a chain just
+  oscillates between `x` and `-x` and never mixes. Drawing the step size
+  uniformly from `step_size * [1 - jitter, 1 + jitter]` on each iteration breaks
+  this resonance (Neal, 2011, "MCMC using Hamiltonian dynamics", Sec. 5.4.2.2).
+
+  This wraps the algorithm's `step` function, so it works with any blackjax
+  version and any algorithm that takes a `step_size`.
+
+  Args:
+    algorithm: blackjax top-level sampling API (e.g. `blackjax.hmc`).
+    algorithm_kwargs: keyword arguments for `algorithm`, including `step_size`.
+    step_size_jitter: relative half-width of the uniform jitter, in [0, 1).
+
+  Returns:
+    A blackjax `SamplingAlgorithm`.
+  """
+  if not 0. <= step_size_jitter < 1.:
+    raise ValueError(
+        f"step_size_jitter must be in [0, 1), got {step_size_jitter}.")
+  sampling_algorithm = algorithm(**algorithm_kwargs)
+
+  def step(rng_key, state):
+    jitter_key, step_key = jax.random.split(rng_key)
+    scale = jax.random.uniform(
+        jitter_key, minval=1. - step_size_jitter, maxval=1. + step_size_jitter)
+    step_size = jax.tree.map(lambda s: s * scale, algorithm_kwargs["step_size"])
+    jittered = algorithm(**(algorithm_kwargs | {"step_size": step_size}))
+    return jittered.step(step_key, state)
+
+  return sampling_algorithm._replace(step=step)
+
+
 _ADAPT_FNS = {
     "window": blackjax.window_adaptation,
     "pathfinder": blackjax.pathfinder_adaptation,
@@ -69,6 +122,8 @@ def get_extra_kwargs(kwargs):
       "num_chains": 8,
       "num_draws": 500,
       "num_adapt_draws": 500,
+      # Opt-in relative step size jitter for the sampling phase (0 = off).
+      "step_size_jitter": 0.0,
       "return_pytree": False}
   shared.update_with_kwargs(defaults, kwargs=kwargs)
   return defaults
@@ -180,7 +235,8 @@ def _blackjax_inference(
     adapt_parameters,
     algorithm,
     num_draws,
-    kwargs):
+    kwargs,
+    step_size_jitter=0.0):
   """Run blackjax inference loop in a vmappable way.
 
   Args:
@@ -190,14 +246,24 @@ def _blackjax_inference(
     algorithm: name of algorithm to run.
     num_draws: number of iterations to run for.
     kwargs: Extra keyword arguments for algorithm.
+    step_size_jitter: Optional relative step size jitter (0 disables it).
 
   Returns:
   The results of the inference and the adaptation:
     (states, infos), adaptation_parameters
   """
 
+  # Newer blackjax adaptations may return private diagnostics (e.g.
+  # `_pathfinder_psis_pareto_k`) alongside the tuned parameters; these are not
+  # arguments to the sampling algorithm, so drop them.
+  adapt_parameters = {
+      k: v for k, v in adapt_parameters.items() if not k.startswith("_")}
   algorithm_kwargs = kwargs[_convert_algorithm(algorithm)] | adapt_parameters
-  inference_algorithm = algorithm(**algorithm_kwargs)
+  if step_size_jitter:
+    inference_algorithm = _with_jittered_step_size(
+        algorithm, algorithm_kwargs, step_size_jitter)
+  else:
+    inference_algorithm = algorithm(**algorithm_kwargs)
   # This is protecting against a change in blackjax where the
   # return from `run_inference_algorithm` changes from
   # `_, states, infos` to `_, (states, infos)`. This one weird
@@ -206,7 +272,7 @@ def _blackjax_inference(
       rng_key=seed,
       inference_algorithm=inference_algorithm,
       num_steps=num_draws,
-      progress_bar=False,
+      **_INFERENCE_EXTRA_KWARGS,
       **{_INFERENCE_KWARG: adapt_state})
   if len(ret) == 2:  # For newer blackjax versions (1.2.4+)
     return ret[1]
@@ -220,7 +286,8 @@ def _blackjax_inference_loop(
     adapt_fn,
     algorithm,
     num_draws,
-    kwargs):
+    kwargs,
+    step_size_jitter=0.0):
   """Constructs and runs inference loop."""
   adapt_seed, inference_seed = jax.random.split(seed)
   adapt_state, adapt_parameters = _blackjax_adapt(
@@ -231,7 +298,8 @@ def _blackjax_inference_loop(
       adapt_parameters,
       algorithm,
       num_draws,
-      kwargs), adapt_parameters
+      kwargs,
+      step_size_jitter=step_size_jitter), adapt_parameters
 
 
 def _blackjax_stats_to_dict(sample_stats, potential_energy, adapt_parameters):
@@ -275,6 +343,7 @@ def get_adaptation_kwargs(adaptation_algorithm, algorithm, log_density, kwargs):
   """Sets defaults and merges user-provided adaptation keywords."""
   adaptation_kwargs, adaptation_required = shared.get_default_signature(
       adaptation_algorithm)
+  adaptation_defaults = dict(adaptation_kwargs)
   adaptation_kwargs.update(
       {k: kwargs[k] for k in adaptation_required if k in kwargs})
   if "logdensity_fn" in adaptation_required:
@@ -300,9 +369,6 @@ def get_adaptation_kwargs(adaptation_algorithm, algorithm, log_density, kwargs):
         f"{','.join(adaptation_required)}. Probably file a bug, but "
         "you can try to manually supply them as keywords."
     )
-  adaptation_kwargs.update(
-      {k: kwargs[k] for k in adaptation_kwargs if k in kwargs}
-  )
   # step_size will get adapted -- maybe warn if this is set manually, and
   # suggest setting init_step_size instead?
   adaptation_kwargs.pop("step_size", None)
@@ -312,8 +378,24 @@ def get_adaptation_kwargs(adaptation_algorithm, algorithm, log_density, kwargs):
   adaptation_kwargs.pop("divergence_threshold", None)
   adaptation_kwargs.pop("integrator", None)
   adaptation_kwargs.pop("max_num_doublings", None)
+  # Newer blackjax (>= 1.7) exposes `build_proposal` on `hmc`/`dynamic_hmc`,
+  # but the adaptation kernels do not accept it as an extra parameter.
+  adaptation_kwargs.pop("build_proposal", None)
 
+  # Construct the adaptation with default values only to introspect `run`.
+  # Newer blackjax adaptations validate their arguments eagerly, and user
+  # supplied values are validated when the sampler actually runs.
   adapt = adaptation_algorithm(**adaptation_kwargs)
+  adaptation_kwargs.update(
+      {k: kwargs[k] for k in adaptation_kwargs if k in kwargs}
+  )
+  # Newer blackjax (>= 1.7) added an optional `num_chains` argument to
+  # per-chain adaptations such as `pathfinder_adaptation`. bayeux already runs
+  # these adaptations once per chain, so keep the single-chain default rather
+  # than forwarding bayeux's `num_chains`. Adaptations that require
+  # `num_chains` (e.g. chees, meads) adapt all chains jointly and still get it.
+  if "num_chains" in adaptation_defaults:
+    adaptation_kwargs["num_chains"] = adaptation_defaults["num_chains"]
   run_kwargs, run_required = shared.get_default_signature(adapt.run)
   run_required.remove("rng_key")
   run_kwargs.update({k: kwargs[k] for k in run_required if k in kwargs})
@@ -379,7 +461,8 @@ def _sample_blackjax_dynamic(
       adapt_parameters=adapt_parameters,
       algorithm=algorithm,
       num_draws=num_draws,
-      kwargs=kwargs)
+      kwargs=kwargs,
+      step_size_jitter=extra_parameters["step_size_jitter"])
   map_seed = jax.random.split(seed, num_chains)
   mapped_sampler = shared.map_fn(chain_method, sampler)
 
@@ -416,7 +499,8 @@ def _sample_blackjax(
       algorithm=algorithm,
       adapt_fn=adapt_fn,
       num_draws=num_draws,
-      kwargs=kwargs)
+      kwargs=kwargs,
+      step_size_jitter=extra_parameters["step_size_jitter"])
   map_seed = jax.random.split(seed, num_chains)
   mapped_sampler = shared.map_fn(chain_method, sampler)
 
